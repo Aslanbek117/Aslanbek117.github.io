@@ -64,7 +64,7 @@ class CinemaScreenShape extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(20), // Add a margin of 20 pixels
+      margin: EdgeInsets.all(0), // Add a margin of 20 pixels
 
       width: double.infinity, // Take up full width
       height: 30,
@@ -87,7 +87,7 @@ class CinemaScreenShape extends StatelessWidget {
             child: Text(
               'Screen', // Replace with your text
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
               ),

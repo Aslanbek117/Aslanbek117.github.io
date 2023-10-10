@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:the_basics/final-hall-plan.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 // void main() => runApp(MyApp());
 
+
 class MoviePage extends StatelessWidget {
-  @override
+  final String movieID;
+
+  const MoviePage({super.key, required this.movieID});
+  
+   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: MyHomePage()
-        // title: 'My Web Page',
-        // debugShowCheckedModeBanner: false,
-        // theme: ThemeData(
-        //   primarySwatch: Colors.blue,
-        // ),
-        // home: MyHomePage(),
+    return Scaffold(body: MyHomePage(movieID: movieID)
         );
   }
 }
 
+
 class MyHomePage extends StatelessWidget {
+  final String movieID;
+
+  const MyHomePage({super.key, required this.movieID});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,12 +53,15 @@ class MyHomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: Scaffold(backgroundColor: Colors.black, body: Layout()));
+        body: Scaffold(backgroundColor: Colors.black, body: Layout(movieID: movieID)));
   }
 }
 
 class MovieCard extends StatelessWidget {
-  const MovieCard({super.key});
+  final String title; 
+  final String genres;
+  final String url;
+  const MovieCard({super.key, required this.title, required this.genres, required this.url});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +93,7 @@ class MovieCard extends StatelessWidget {
                 children: <Widget>[
                   // Add an image widget to display an image
                   Image.network(
-                    "https://cdn.kino.kz/movies/Saw_X/p168x242.webp",
+                    url,
                     height: 100,
                     fit: BoxFit.cover,
                   ),
@@ -95,13 +104,13 @@ class MovieCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text("Saw X",
+                        Text(title,
                             style:
                                 TextStyle(color: Colors.white, fontSize: 20)),
                         // Add some spacing between the title and the subtitle
                         Container(height: 5),
                         // Add a subtitle widget
-                        Text("ужасы/триллер/драма",
+                        Text(genres,
                             style: TextStyle(
                                 color: Colors.grey[400], fontSize: 12)),
                         // Add some spacing between the subtitle and the text
@@ -273,12 +282,76 @@ class SeanceDate extends StatelessWidget {
   }
 }
 
-class Layout extends StatelessWidget {
+
+class Layout extends StatefulWidget {
+  final String movieID;
+
+  const Layout({super.key, required this.movieID});
+  
+  @override
+  LayoutState createState() => LayoutState(movieID: movieID);
+}
+
+class MovieInfo {
+  String title; 
+  String genres;
+  String url;
+
+  MovieInfo({required this.title, required this.genres, required this.url}); 
+  
+}
+
+
+class LayoutState extends State<Layout> {
+  final String movieID;
+  
+
+  dynamic md;
+  MovieInfo res = MovieInfo(title: "", genres: "", url: "");
+  bool isLoading = true;
+
+  LayoutState({required this.movieID});
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse(
+        'https://api.kino.kz/catalog/v1/movie?movie_id=${movieID}'));
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+      setState(() {
+        final Map<String, dynamic> data = json.decode(response.body);
+        md = data["result"];
+        var title = md["name_origin"];
+        var genres = "";
+        var url = md["posters"]["p168x242"];
+        for (var i in md["genres"]) {
+          genres +=i["title_eng"] + "/";
+        }
+        genres = genres.substring(0, genres.length - 1);
+        res.title = title;
+        res.url = url;
+        res.genres = genres;
+        isLoading = false;
+        print(md);
+      });
+    } else {
+      // If the server did not return a 200 OK response,
+      // throw an exception.
+      throw Exception('Failed to load data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        MovieCard(),
+        isLoading ? CircularProgressIndicator() : MovieCard(title: res.title, genres: res.genres, url: res.url),
+        // MovieCard(title: res.title, genres: res.genres),
         Expanded(child: SeanceCard()),
       ],
     );

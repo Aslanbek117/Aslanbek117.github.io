@@ -47,86 +47,105 @@ class _MyAppState extends State<MyApp> {
     // Ensure that maxScale is greater than or equal to minScale
     double maxScale = max(minScale, 10.0);
 
-    return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(
-            title: Text('Select seats',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.normal,
-                )),
-          ),
-          body: Container(
-            color: Colors
-                .white, //Color.fromARGB(0, 6, 1, 11), // Set your desired background color
-            child: Column(
-              children: [
-                Center(
-                  // Center only the movie information
-                  child: Container(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'The Matrix',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Chaplin mega',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w200),
-                        ),
-                        Text(
-                          '2021-01-01  23:00 Hall 8',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+    return Scaffold(
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
 
-                CinemaScreenShape(),
-
-                Expanded(
-                    flex: 3,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: InteractiveViewer(
-                        maxScale: maxScale,
-                        child: SeatGrid(
-                          cinemaRows: cinemaRows,
-                          minScale: minScale,
-                          horizontalGap: 5.0,
-                          verticalGap: 5.0,
-                          onSeatSelected: (Seat seat) {
-                            if (!selectedSeats.contains(seat)) {
-                              setState(() {
-                                selectedSeats.add(seat);
-                              });
-                            } else {
-                              setState(() {
-                                selectedSeats.remove(seat);
-                              });
-                            }
-                            print(
-                                'Selected Seats: ${selectedSeats.map((s) => s.place).toList()}');
-                          },
+          backgroundColor: Colors.grey[900],
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back), color: Colors.white,
+            onPressed: () {
+              try {
+                Navigator.pop(context);
+              } catch (e) {
+                print('Error navigating back: $e');
+              }
+            }, // Set the color of the icon
+          ), // Left icon
+          title: Text('Выберите места',
+              style: TextStyle(
+                  color: Colors.white, fontSize: 18)), // Centered text
+          actions: [
+            // You can add any additional actions here
+            IconButton(
+              color: Colors.white,
+              icon: Icon(Icons.close),
+              onPressed: () {
+                // Handle search action
+              },
+            ),
+          ],
+        ),
+        body: Container(
+          color: Colors.grey[
+              900], //Color.fromARGB(0, 6, 1, 11), // Set your desired background color
+          child: Column(
+            children: [
+              Center(
+                // Center only the movie information
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'The Matrix',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )),
-                // Display Selected Seats
-                 Container(
+                      Text(
+                        'Chaplin mega',
+                        style: TextStyle(
+                            color: Colors.grey[300],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w200),
+                      ),
+                      Text(
+                        '2021-01-01  23:00 Hall 8',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              CinemaScreenShape(),
+
+              Expanded(
+                  flex: 3,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: InteractiveViewer(
+                      maxScale: maxScale,
+                      child: SeatGrid(
+                        cinemaRows: cinemaRows,
+                        minScale: minScale,
+                        horizontalGap: 5.0,
+                        verticalGap: 5.0,
+                        onSeatSelected: (Seat seat) {
+                          if (!selectedSeats.contains(seat)) {
+                            setState(() {
+                              selectedSeats.add(seat);
+                            });
+                          } else {
+                            setState(() {
+                              selectedSeats.remove(seat);
+                            });
+                          }
+                          print(
+                              'Selected Seats: ${selectedSeats.map((s) => s.place).toList()}');
+                        },
+                      ),
+                    ),
+                  )),
+              // Display Selected Seats
+              Container(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
                   children: [
@@ -150,13 +169,23 @@ class _MyAppState extends State<MyApp> {
                             Container(
                               margin: EdgeInsets.all(8.0),
                               padding: EdgeInsets.all(8.0),
-                              color: Colors.white,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                border: Border.all(
+                                    color:Colors.black
+                                        ),
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                        16.0) //                 <--- border radius here
+                                    ),
+                              ),
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
+                                  Center(child: Text(
                                     'Seat ${seat.place}',
-                                    style: TextStyle(fontSize: 16.0),
-                                  ),
+                                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                                  )),
+                                  
                                   SizedBox(width: 8.0),
                                   GestureDetector(
                                     onTap: () {
@@ -167,7 +196,7 @@ class _MyAppState extends State<MyApp> {
                                     child: Icon(
                                       Icons.close,
                                       size: 20.0,
-                                      color: Colors.black,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
@@ -179,10 +208,9 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               ),
-              ],
-            ),
-          )),
-    );
+            ],
+          ),
+        ));
   }
 }
 
@@ -343,7 +371,7 @@ class SeatWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(
           horizontal: horizontalGap, vertical: verticalGap),
       decoration: BoxDecoration(
-        color: seat.isSelected ? Colors.blue : _getSeatColor(),
+        color: seat.isSelected ? Colors.amber : _getSeatColor(),
         border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(8.0),
       ),
