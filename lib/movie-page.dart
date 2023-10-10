@@ -5,19 +5,16 @@ import 'package:http/http.dart' as http;
 
 // void main() => runApp(MyApp());
 
-
 class MoviePage extends StatelessWidget {
   final String movieID;
 
   const MoviePage({super.key, required this.movieID});
-  
-   @override
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(body: MyHomePage(movieID: movieID)
-        );
+    return Scaffold(body: MyHomePage(movieID: movieID));
   }
 }
-
 
 class MyHomePage extends StatelessWidget {
   final String movieID;
@@ -53,15 +50,20 @@ class MyHomePage extends StatelessWidget {
             ),
           ],
         ),
-        body: Scaffold(backgroundColor: Colors.black, body: Layout(movieID: movieID)));
+        body: Scaffold(
+            backgroundColor: Colors.black, body: Layout(movieID: movieID)));
   }
 }
 
 class MovieCard extends StatelessWidget {
-  final String title; 
+  final String title;
   final String genres;
   final String url;
-  const MovieCard({super.key, required this.title, required this.genres, required this.url});
+  const MovieCard(
+      {super.key,
+      required this.title,
+      required this.genres,
+      required this.url});
 
   @override
   Widget build(BuildContext context) {
@@ -282,29 +284,25 @@ class SeanceDate extends StatelessWidget {
   }
 }
 
-
 class Layout extends StatefulWidget {
   final String movieID;
 
   const Layout({super.key, required this.movieID});
-  
+
   @override
   LayoutState createState() => LayoutState(movieID: movieID);
 }
 
 class MovieInfo {
-  String title; 
+  String title;
   String genres;
   String url;
 
-  MovieInfo({required this.title, required this.genres, required this.url}); 
-  
+  MovieInfo({required this.title, required this.genres, required this.url});
 }
-
 
 class LayoutState extends State<Layout> {
   final String movieID;
-  
 
   dynamic md;
   MovieInfo res = MovieInfo(title: "", genres: "", url: "");
@@ -312,8 +310,8 @@ class LayoutState extends State<Layout> {
 
   LayoutState({required this.movieID});
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse(
-        'https://api.kino.kz/catalog/v1/movie?movie_id=${movieID}'));
+    final response = await http.get(
+        Uri.parse('https://api.kino.kz/catalog/v1/movie?movie_id=${movieID}'));
 
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON
@@ -324,14 +322,13 @@ class LayoutState extends State<Layout> {
         var genres = "";
         var url = md["posters"]["p168x242"];
         for (var i in md["genres"]) {
-          genres +=i["title_eng"] + "/";
+          genres += i["title_eng"] + "/";
         }
         genres = genres.substring(0, genres.length - 1);
         res.title = title;
         res.url = url;
         res.genres = genres;
         isLoading = false;
-        print(md);
       });
     } else {
       // If the server did not return a 200 OK response,
@@ -350,15 +347,102 @@ class LayoutState extends State<Layout> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        isLoading ? CircularProgressIndicator() : MovieCard(title: res.title, genres: res.genres, url: res.url),
+        isLoading
+            ? CircularProgressIndicator()
+            : MovieCard(title: res.title, genres: res.genres, url: res.url),
         // MovieCard(title: res.title, genres: res.genres),
-        Expanded(child: SeanceCard()),
+        Expanded(child: Schedule(movieID: movieID)),
       ],
     );
   }
 }
 
-class SeanceCard extends StatelessWidget {
+class Cinema {
+  final String title;
+  final String address;
+
+  Cinema({required this.title, required this.address});
+}
+
+class SeanceInfo {
+  final int adult;
+  final int child;
+  final int student;
+  final String hour;
+  final String minutes;
+
+  SeanceInfo(
+      {required this.adult,
+      required this.child,
+      required this.student,
+      required this.hour,
+      required this.minutes});
+}
+
+class ScheduleInfo {
+  final Cinema cinema;
+  final SeanceInfo seances;
+
+  ScheduleInfo({required this.cinema, required this.seances});
+}
+
+class Schedule extends StatefulWidget {
+  final String movieID;
+
+  const Schedule({super.key, required this.movieID});
+
+  @override
+  ScheduleState createState() => ScheduleState(movieID: movieID);
+}
+
+class ScheduleState extends State<Schedule> {
+  final String movieID;
+  bool isLoading = true;
+
+  List<ScheduleInfo> res = [];
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse(
+        'https://api.kino.kz/sessions/v1/movie/sessions?movie_id=${movieID}&date=2023-10-10&city_id=2'));
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+      setState(() {
+        final Map<String, dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        // final Map<String, dynamic> data = json.decode(response.body);
+
+        for (var it in data["result"]["sessions"]) {
+          var cinema = Cinema(
+              address: it["cinema"]["address"], title: it["cinema"]["name"]);
+          var seance = SeanceInfo(
+              adult: it["session"]["adult"],
+              child: it["session"]["child"],
+              student: it["session"]["student"],
+              hour: it["session"]["hour"],
+              minutes: it["session"]["minutes"]);
+          var info = ScheduleInfo(cinema: cinema, seances: seance);
+          res.add(info);
+        }
+        print(res.length);
+        // var item = ScheduleInfo(cinema: "");
+        // for (var it in data["result"]["available_dates"]) {
+        //   item.availableDates+=it.toString();
+        // }
+        // print(item.availableDates);
+        isLoading = false;
+      });
+    } else {
+      // If the server did not return a 200 OK response,
+      // throw an exception.
+      throw Exception('Failed to load data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   final List<String> entries = <String>[
     'A',
     'B',
@@ -383,134 +467,138 @@ class SeanceCard extends StatelessWidget {
     200
   ];
 
+  ScheduleState({required this.movieID});
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MyApp()),
-            ),
-        child: ListView.separated(
-          padding: const EdgeInsets.only(top: 12),
-          itemCount: entries.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Container(
-                // height: 50,
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[900],
-                  borderRadius: BorderRadius.circular(8.0),
+    return isLoading
+        ? CircularProgressIndicator()
+        : GestureDetector(
+            onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyApp()),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          // margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Center(
-                              child: Text("14:40",
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(color: Colors.white))),
-                        ),
-                        SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Chaplin Mega Park",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white)),
-                            Text("Chaplin Mega Park 1.",
-                                softWrap: true,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.grey[400]))
-                          ],
-                        )
-                      ],
+            child: ListView.separated(
+              padding: const EdgeInsets.only(top: 12),
+              itemCount: res.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                    // height: 50,
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    Divider(),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
                               // margin: EdgeInsets.all(8),
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Center(
-                                  child: Text("Язык: ru",
+                                  child: Text(res[index].seances.hour +  ":" + res[index].seances.minutes,
                                       textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 10))),
+                                      style: TextStyle(color: Colors.white))),
                             ),
+                            SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(res[index].cinema.title,
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white)),
+                                Text(res[index].cinema.address.substring(0,10),
+                                    softWrap: true,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey[400]))
+                              ],
+                            )
                           ],
                         ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Center(
-                                  child: Text("студ.",
+                        Divider(),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  // margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                  ),
+                                  child: Center(
+                                      child: Text("Язык: ru",
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              color: Colors.grey[500],
+                                              fontSize: 10))),
+                                ),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Center(
+                                      child: Text("студ.",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[400]))),
+                                  Text(res[index].seances.student.toString(),
                                       style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[400]))),
-                              Text("1300",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white))
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Center(
-                                  child: Text("детский",
+                                          fontSize: 16, color: Colors.white))
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Center(
+                                      child: Text("детский",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[400]))),
+                                  Text(res[index].seances.child.toString(),
                                       style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[400]))),
-                              Text("1500",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white))
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Center(
-                                  child: Text("взрос.",
+                                          fontSize: 16, color: Colors.white))
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Center(
+                                      child: Text("взрос.",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey[400]))),
+                                  Text(res[index].seances.adult.toString(),
                                       style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[400]))),
-                              Text("1900",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white))
-                            ],
-                          ),
+                                          fontSize: 16, color: Colors.white))
+                                ],
+                              ),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
-                ));
-          },
-          separatorBuilder: (BuildContext context, int index) =>
-              SizedBox(height: 20),
-        ));
+                    ));
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  SizedBox(height: 20),
+            ));
   }
 }
