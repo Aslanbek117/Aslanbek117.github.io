@@ -51,8 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      // backgroundColor: Colors.yellow[900],
       appBar: AppBar(
+      scrolledUnderElevation: 0.0,
+
         backgroundColor: Colors.grey[900],
         leading: Icon(
           Icons.arrow_back, color: Colors.white, // Set the color of the icon
@@ -75,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             color: Colors.grey[900],
             padding:
-                EdgeInsets.only(left: 16.0, right: 16.0, top: 4, bottom: 16),
+                EdgeInsets.only(left: 16.0, right: 16.0, top: 0, bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -140,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   ],
                 ),
-                SizedBox(height: 20.0),
+                SizedBox(height: 10.0),
                 Row(
                   children: [
                     Expanded(

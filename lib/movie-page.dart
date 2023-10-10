@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:the_basics/final-hall-plan.dart';
 
 // void main() => runApp(MyApp());
 
 class MoviePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: MyHomePage()
-      // title: 'My Web Page',
-      // debugShowCheckedModeBanner: false,
-      // theme: ThemeData(
-      //   primarySwatch: Colors.blue,
-      // ),
-      // home: MyHomePage(),
-    );
+    return Scaffold(body: MyHomePage()
+        // title: 'My Web Page',
+        // debugShowCheckedModeBanner: false,
+        // theme: ThemeData(
+        //   primarySwatch: Colors.blue,
+        // ),
+        // home: MyHomePage(),
+        );
   }
 }
 
@@ -23,6 +23,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.grey[900],
+          scrolledUnderElevation: 0.0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back), color: Colors.white,
             onPressed: () {
@@ -311,123 +312,132 @@ class SeanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(top: 12),
-      itemCount: entries.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-            // height: 50,
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[900],
-              borderRadius: BorderRadius.circular(8.0),
+    return GestureDetector(
+        onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
             ),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Center(
-                          child: Text("14:40",
-                              textAlign: TextAlign.start,
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                    SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Chaplin Mega Park",
-                            style:
-                                TextStyle(fontSize: 16, color: Colors.white)),
-                        Text("Chaplin Mega Park 1.",
-                            softWrap: true,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey[400]))
-                      ],
-                    )
-                  ],
+        child: ListView.separated(
+          padding: const EdgeInsets.only(top: 12),
+          itemCount: entries.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Container(
+                // height: 50,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                Divider(),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           // margin: EdgeInsets.all(8),
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Center(
-                              child: Text("Язык: ru",
+                              child: Text("14:40",
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 10))),
+                                  style: TextStyle(color: Colors.white))),
                         ),
+                        SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Chaplin Mega Park",
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white)),
+                            Text("Chaplin Mega Park 1.",
+                                softWrap: true,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[400]))
+                          ],
+                        )
                       ],
                     ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Center(
-                              child: Text("студ.",
+                    Divider(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              // margin: EdgeInsets.all(8),
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                              ),
+                              child: Center(
+                                  child: Text("Язык: ru",
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 10))),
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Center(
+                                  child: Text("студ.",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[400]))),
+                              Text("1300",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.grey[400]))),
-                          Text("1300",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white))
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Center(
-                              child: Text("детский",
+                                      fontSize: 16, color: Colors.white))
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Center(
+                                  child: Text("детский",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[400]))),
+                              Text("1500",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.grey[400]))),
-                          Text("1500",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white))
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Center(
-                              child: Text("взрос.",
+                                      fontSize: 16, color: Colors.white))
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Center(
+                                  child: Text("взрос.",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[400]))),
+                              Text("1900",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.grey[400]))),
-                          Text("1900",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white))
-                        ],
-                      ),
+                                      fontSize: 16, color: Colors.white))
+                            ],
+                          ),
+                        )
+                      ],
                     )
                   ],
-                )
-              ],
-            ));
-      },
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: 20),
-    );
+                ));
+          },
+          separatorBuilder: (BuildContext context, int index) =>
+              SizedBox(height: 20),
+        ));
   }
 }
